@@ -16,14 +16,12 @@
   <style>
     body { font-family: 'Inter', sans-serif; }
 
-    /* Message entrance animation */
     @keyframes msgIn {
       from { opacity: 0; transform: translateY(5px); }
       to   { opacity: 1; transform: translateY(0); }
     }
     .msg-enter { animation: msgIn 0.2s ease forwards; }
 
-    /* Typing indicator */
     .dot {
       width: 7px; height: 7px; border-radius: 50%;
       background: #94a3b8; display: inline-block;
@@ -36,17 +34,16 @@
       30%            { transform: translateY(-5px); }
     }
 
-    /* Chat scrollbar */
-    #chat::-webkit-scrollbar { width: 4px; }
+    #chat::-webkit-scrollbar       { width: 4px; }
     #chat::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 2px; }
 
-    /* Toggle switch */
+    /* Network toggle */
     .toggle-track { width: 44px; height: 24px; border-radius: 12px; position: relative; cursor: pointer; transition: background 0.25s; background: #cbd5e1; }
     .toggle-track.on { background: #14b8a6; }
     .toggle-thumb { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.25); transition: transform 0.25s cubic-bezier(0.34,1.4,0.64,1); }
     .toggle-track.on .toggle-thumb { transform: translateX(20px); }
 
-    /* AI message content styling */
+    /* AI bubble content */
     .ai-bubble strong { color: #0f766e; font-weight: 600; }
     .ai-bubble em     { color: #92400e; font-style: italic; }
     .ai-bubble code   { background: #f0fdfa; color: #0f766e; padding: 1px 5px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.8em; }
@@ -63,7 +60,7 @@
     .tab-card.active-pt { border-color: #d97706; background: #fffbeb; }
     .tab-card.active-wy { border-color: #ea580c; background: #fff7ed; }
 
-    /* Quick-query suggestion buttons */
+    /* Quick-query buttons */
     .quick-btn {
       flex-shrink: 0;
       font-size: 0.72rem;
@@ -77,21 +74,20 @@
       cursor: pointer;
       transition: border-color 0.15s, background 0.15s, color 0.15s;
     }
-    .quick-btn:hover        { border-color: #5eead4; background: #f0fdfa; color: #0f766e; }
-    .quick-btn:active       { background: #ccfbf1; }
-    /* Scrollbar for the quick-buttons strip */
+    .quick-btn:hover  { border-color: #5eead4; background: #f0fdfa; color: #0f766e; }
+    .quick-btn:active { background: #ccfbf1; }
+
     #quickButtons::-webkit-scrollbar       { height: 3px; }
     #quickButtons::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 2px; }
   </style>
 </head>
 
-<body class="bg-slate-100 flex flex-col" style="height:100vh;overflow:hidden;">
+<body class="bg-slate-100 flex flex-col" style="height:100vh; overflow:hidden;">
 
-  <!-- ===== HEADER ===== -->
+  <!-- HEADER -->
   <header class="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 flex-shrink-0">
     <div class="max-w-2xl mx-auto flex items-center justify-between gap-4">
 
-      <!-- Brand -->
       <div class="flex items-center gap-3">
         <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
              style="background: linear-gradient(135deg, #14b8a6, #0d9488);">
@@ -114,9 +110,7 @@
           <div class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Conexión</div>
           <div id="modeLabel" class="text-xs font-semibold text-blue-500 mt-0.5">🌐 Demo Remoto</div>
         </div>
-        <!-- Toggle: click handled by JS, avoids peer-class CDN issues -->
         <div id="networkToggle" class="toggle-track" onclick="toggleMode()" title="Cambiar modo de conexión"></div>
-        <!-- Hidden thumb rendered inside toggle by JS -->
       </div>
 
     </div>
@@ -125,22 +119,22 @@
   <!-- Mode info banner -->
   <div id="modeBanner"
        class="flex-shrink-0 px-4 py-2 text-xs border-b"
-       style="background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8;">
+       style="background:#eff6ff; border-color:#bfdbfe; color:#1d4ed8;">
     <div class="max-w-2xl mx-auto">
       <strong>Modo Demo activo</strong> — Las respuestas son datos educativos preprogramados (sin petición HTTP real).
       Activa el switch para conectar con Ollama en <span class="font-mono">localhost:11434</span>.
     </div>
   </div>
 
-  <!-- ===== MAIN ===== -->
+  <!-- MAIN -->
   <main class="flex-1 overflow-hidden flex flex-col">
     <div class="flex-1 overflow-hidden flex flex-col max-w-2xl w-full mx-auto px-4 py-4 gap-3">
 
-      <!-- Module selector: 3 clear cards -->
+      <!-- Module selector -->
       <div class="grid grid-cols-3 gap-2 flex-shrink-0">
 
         <button id="tab-english"
-                class="tab-card active-en border-2 rounded-xl p-3 flex flex-col items-center gap-1 bg-blue-50 border-blue-500 cursor-pointer"
+                class="tab-card active-en border-2 border-blue-500 rounded-xl p-3 flex flex-col items-center gap-1 bg-blue-50 cursor-pointer"
                 onclick="switchModule('english')">
           <span class="text-2xl">🇬🇧</span>
           <span class="font-semibold text-sm text-slate-700">Inglés</span>
@@ -165,31 +159,29 @@
 
       </div>
 
-      <!-- Chat card: fills remaining height -->
+      <!-- Chat card -->
       <div class="flex-1 overflow-hidden flex flex-col bg-white rounded-xl shadow-sm border border-slate-200">
 
-        <!-- Chat header: shows active module -->
-        <div id="chatHeader"
-             class="flex-shrink-0 flex items-center gap-2.5 px-4 py-3 border-b border-slate-100">
-          <span id="chatIcon" class="text-xl">🇬🇧</span>
+        <!-- Chat header -->
+        <div id="chatHeader" class="flex-shrink-0 flex items-center gap-2.5 px-4 py-3 border-b border-slate-100">
+          <span id="chatIcon"  class="text-xl">🇬🇧</span>
           <div>
             <div id="chatTitle" class="font-semibold text-slate-700 text-sm leading-none">Tutor de Inglés</div>
             <div id="chatSub"   class="text-xs text-slate-400 mt-0.5">English · Nivel A1–B2</div>
           </div>
-          <!-- Edge status badge, shown only in local mode -->
           <div id="edgeBadge" class="ml-auto hidden">
             <span id="edgeBadgeText"
                   class="text-xs font-semibold px-2 py-0.5 rounded-full"
-                  style="background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;">
+                  style="background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0;">
               Edge conectado
             </span>
           </div>
         </div>
 
-        <!-- Messages area -->
+        <!-- Messages -->
         <div id="chat" class="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3"></div>
 
-        <!-- Quick-query suggestion buttons (scrollable, one row) -->
+        <!-- Quick-query buttons (one scrollable row) -->
         <div class="flex-shrink-0 border-t border-slate-100 px-4 py-2 overflow-x-auto">
           <div id="quickButtons" class="flex gap-2"></div>
         </div>
@@ -206,10 +198,8 @@
           <button
             id="sendBtn"
             onclick="enviarMensaje()"
-            class="flex-shrink-0 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-all"
-            style="background:linear-gradient(135deg,#14b8a6,#0d9488);"
-            onmouseover="if(!this.disabled)this.style.opacity='0.9'"
-            onmouseout="this.style.opacity='1'">
+            class="flex-shrink-0 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity"
+            style="background: linear-gradient(135deg, #14b8a6, #0d9488);">
             Enviar
           </button>
         </div>
@@ -219,58 +209,26 @@
   </main>
 
 
-  <!-- ===== JAVASCRIPT ===== -->
   <script>
   "use strict";
 
-  // Application state
+  // ---------- Estado ----------
   let currentModule = "english";
   let currentMode   = "demo"; // "demo" | "edge"
   let isLoading     = false;
 
-  // Module display metadata
+  // ---------- Metadatos de módulos ----------
   const MODULE_META = {
-    english:    { icon: "🇬🇧", title: "Tutor de Inglés",          sub: "English · Nivel A1–B2",                  tabClass: "active-en" },
-    portuguese: { icon: "🇧🇷", title: "Tutor de Português",        sub: "Português Brasileiro · A1–B1",            tabClass: "active-pt" },
-    wayuunaiki: { icon: "🪶",  title: "Módulo Wayuunaiki",         sub: "Lengua Wayuu · La Guajira, Colombia",     tabClass: "active-wy" },
+    english:    { icon: "🇬🇧", title: "Tutor de Inglés",       sub: "English · Nivel A1–B2",              tabClass: "active-en" },
+    portuguese: { icon: "🇧🇷", title: "Tutor de Português",     sub: "Português Brasileiro · A1–B1",        tabClass: "active-pt" },
+    wayuunaiki: { icon: "🪶",  title: "Módulo Wayuunaiki",      sub: "Lengua Wayuu · La Guajira, Colombia", tabClass: "active-wy" },
   };
 
-  // Predefined queries shown as buttons in demo mode.
-  // Each string is phrased in Spanish but contains at least one keyword that
-  // matches an entry in MOCK, so getMockResponse() always returns a real lesson.
-  const QUICK_QUERIES = {
-    english: [
-      "Enséñame los saludos en inglés",
-      "¿Cómo funciona el Past Simple?",
-      "¿Cuáles son los colores en inglés?",
-      "¿Cuáles son los números en inglés?",
-      "Explícame el futuro: will y going to",
-      "¿Qué son las preposiciones de lugar?",
-      "Vocabulario de comidas en inglés",
-    ],
-    portuguese: [
-      "Enséñame los saludos en portugués",
-      "¿Cómo se usan SER y ESTAR en portugués?",
-      "¿Cuáles son los números en portugués?",
-      "Explícame la pronunciación del portugués",
-      "¿Cómo se dice la familia en portugués?",
-    ],
-    wayuunaiki: [
-      "Enséñame los saludos en Wayuunaiki",
-      "¿Cuáles son los números en Wayuunaiki?",
-      "¿Qué significa Juyá para los Wayuu?",
-      "Enséñame frases básicas en Wayuunaiki",
-      "Cuéntame sobre el tejido y colores Wayuu",
-      "¿Cómo es la organización familiar Wayuu?",
-    ],
-  };
-
-  // System prompts sent to phi3 when in edge mode.
-  // The LLM receives this context before the user's question.
+  // ---------- Prompts de sistema para Ollama ----------
   const SYSTEM_PROMPTS = {
     english:
       "You are an English tutor for Colombian rural school students (ages 10–18). " +
-      "Respond always in Spanish, with English terms clearly highlighted. " +
+      "Always respond in Spanish, with English terms clearly highlighted. " +
       "Give a clear explanation, a concrete example, and a short practice exercise.",
     portuguese:
       "Você é um professor de Português Brasileiro para estudantes colombianos. " +
@@ -278,16 +236,30 @@
       "Aproveite as semelhanças com o espanhol. Seja claro e encorajador.",
     wayuunaiki:
       "Eres un guardián del idioma Wayuunaiki, lengua del pueblo Wayuu de La Guajira colombo-venezolana. " +
-      "Responde en español. Incluye la palabra en Wayuunaiki, su pronunciación fonética aproximada y su " +
-      "significado cultural. Trata el tema con profundo respeto hacia la comunidad Wayuu.",
+      "Responde en español. Incluye la palabra en Wayuunaiki, su pronunciación fonética y su significado cultural. " +
+      "Trata el tema con profundo respeto hacia la comunidad Wayuu.",
   };
 
-  // Mock knowledge base for demo mode.
-  // Each entry has an array of trigger keywords and a Markdown response.
+  // ---------- Base de conocimiento ----------
+  //
+  // Estructura de cada entrada:
+  //   id   — identificador único (usado por los botones para búsqueda directa)
+  //   btn  — (opcional) texto del botón; si existe, aparece como sugerencia
+  //   keys — palabras clave para búsqueda en texto libre (evitar palabras
+  //           cortas en inglés que sean substrings de palabras españolas)
+  //   text — respuesta en Markdown
+  //
+  // IMPORTANTE: Los botones usan sendDirectResponse(id), que hace una búsqueda
+  // por ID y nunca pasa por el matcher de keywords. El texto libre sí usa keywords.
+
   const MOCK = {
+
+    // ── INGLÉS ──────────────────────────────────────────────────────────────
     english: [
       {
-        keys: ["hello", "hi", "greet", "buenos", "saludo", "introduc"],
+        id:   "en-greet",
+        btn:  "Saludos en inglés",
+        keys: ["saludo", "greet", "hello"],
         text:
 `**Lesson: Greetings & Introductions 🇬🇧**
 
@@ -298,8 +270,9 @@
 | **Good afternoon** | Buenas tardes | 12 pm – 6 pm |
 | **Good evening** | Buenas noches | Después de las 6 pm |
 | **Nice to meet you!** | ¡Mucho gusto! | Primera vez que se conocen |
+| **Goodbye / Bye!** | Adiós / Chao | Despedida |
 
-💬 **Ejemplo completo:**
+💬 **Introducción completa:**
 *"Hello! My name is Carlos. I'm from Colombia. Nice to meet you!"*
 
 🎯 **Respuestas a "How are you?":**
@@ -309,7 +282,9 @@
 ✍️ **Practica:** Escribe tu propia presentación en inglés.`
       },
       {
-        keys: ["past simple", "pasado", "irregular", "preterit", "yesterday", "went", "did"],
+        id:   "en-past",
+        btn:  "El Past Simple",
+        keys: ["past simple", "pasado", "irregular"],
         text:
 `**Lesson: Past Simple Tense**
 
@@ -329,7 +304,7 @@ Se usa para acciones **completadas en el pasado**.
 | speak | **spoke** | hablar → habló |
 | make | **made** | hacer → hizo |
 
-**Estructuras:**
+**Estructura:**
 - ✅ *She **worked** at school **yesterday**.*
 - ✅ *They **went** to Bogotá **last week**.*
 
@@ -337,7 +312,9 @@ Se usa para acciones **completadas en el pasado**.
 *"**Did** you **eat** lunch today?"* → *"Yes, I did!"*`
       },
       {
-        keys: ["color", "colour", "rojo", "azul", "verde", "red", "blue", "green"],
+        id:   "en-colors",
+        btn:  "Los colores en inglés",
+        keys: ["colores", "colors", "colour", "rojo", "azul", "verde"],
         text:
 `**Lesson: Colors in English 🎨**
 
@@ -357,25 +334,12 @@ Se usa para acciones **completadas en el pasado**.
 - ✅ *a **red** apple · the **blue** sky*
 - ❌ *an apple red*
 
-🌈 La bandera colombiana tiene rayas **yellow**, **blue** y **red**.`
+🌈 La bandera colombiana tiene **yellow**, **blue** y **red**.`
       },
       {
-        keys: ["number", "número", "count", "one", "two", "three", "contar"],
-        text:
-`**Lesson: Numbers in English 🔢**
-
-\`1 one · 2 two · 3 three · 4 four · 5 five\`
-\`6 six · 7 seven · 8 eight · 9 nine · 10 ten\`
-\`11 eleven · 12 twelve · 13 thirteen · 14 fourteen · 15 fifteen\`
-\`16 sixteen · 17 seventeen · 18 eighteen · 19 nineteen · 20 twenty\`
-
-**Decenas:** \`30 thirty · 40 forty · 50 fifty · 60 sixty · 100 one hundred\`
-
-**Números compuestos (21–99):** se unen con guion:
-*21 = twenty-**one*** · *35 = thirty-**five*** · *99 = ninety-**nine***`
-      },
-      {
-        keys: ["future", "will", "going to", "futuro", "tomorrow", "mañana", "plan"],
+        id:   "en-future",
+        btn:  "El futuro: will y going to",
+        keys: ["futuro", "going to", "will"],
         text:
 `**Lesson: Expressing the Future**
 
@@ -394,8 +358,25 @@ Se usa para acciones **completadas en el pasado**.
 | Plan previo | **going to** | *"I'm going to visit Medellín."* |
 | Predicción con evidencia | **going to** | *"She's going to win!"* |`
       },
+      // Entradas adicionales accesibles solo por texto libre (sin botón)
       {
-        keys: ["preposition", "in", "on", "at", "under", "between", "donde", "place", "lugar"],
+        id:   "en-numbers",
+        keys: ["números", "contar en inglés"],
+        text:
+`**Lesson: Numbers in English 🔢**
+
+\`1 one · 2 two · 3 three · 4 four · 5 five\`
+\`6 six · 7 seven · 8 eight · 9 nine · 10 ten\`
+\`11 eleven · 12 twelve · 13 thirteen · 14 fourteen · 15 fifteen\`
+\`16 sixteen · 17 seventeen · 18 eighteen · 19 nineteen · 20 twenty\`
+
+**Decenas:** \`30 thirty · 40 forty · 50 fifty · 60 sixty · 100 one hundred\`
+
+**Compuestos (21–99):** se unen con guion: *21 = twenty-**one*** · *99 = ninety-**nine***`
+      },
+      {
+        id:   "en-prepositions",
+        keys: ["preposiciones", "preposition"],
         text:
 `**Lesson: Prepositions of Place 📍**
 
@@ -407,12 +388,11 @@ Se usa para acciones **completadas en el pasado**.
 | **under** | Debajo de | *The cat is **under** the chair.* |
 | **between** | Entre dos cosas | *Colombia is **between** Venezuela and Panamá.* |
 | **next to** | Al lado de | *The hospital is **next to** the park.* |
-| **behind** | Detrás de | *The garden is **behind** the house.* |
-
-✍️ **Practica:** Describe dónde están 3 objetos en tu salón de clase.`
+| **behind** | Detrás de | *The garden is **behind** the house.* |`
       },
       {
-        keys: ["food", "meal", "breakfast", "lunch", "dinner", "comida", "comer"],
+        id:   "en-food",
+        keys: ["comida", "comidas", "desayuno", "almuerzo"],
         text:
 `**Lesson: Food & Meals 🍽️**
 
@@ -426,17 +406,19 @@ Se usa para acciones **completadas en el pasado**.
 | fish | pescado |
 | bread | pan |
 | water | agua |
-| fruit | fruta |
 
-💬 **Frases en el restaurante:**
+💬 **En el restaurante:**
 - *"I would like to order…"* — Quisiera pedir…
 - *"The bill, please."* — La cuenta, por favor.`
       },
     ],
 
+    // ── PORTUGUÉS ────────────────────────────────────────────────────────────
     portuguese: [
       {
-        keys: ["olá", "oi", "bom dia", "saudação", "saludo", "greet"],
+        id:   "pt-greet",
+        btn:  "Saludos en portugués",
+        keys: ["saludo", "saudações", "bom dia"],
         text:
 `**Lição: Saudações em Português Brasileiro 🇧🇷**
 
@@ -454,10 +436,12 @@ Se usa para acciones **completadas en el pasado**.
 — *"Oi! Tudo bem?"*
 — *"Tudo ótimo, obrigado! E você?"*
 
-🇨🇴 **Para colombianos:** ¡El portugués y el español son lenguas hermanas! Comparten ~89% del vocabulario.`
+🇨🇴 El portugués y el español comparten ~89% del vocabulario. ¡Ya tienes una gran ventaja!`
       },
       {
-        keys: ["ser", "estar", "sou", "estou", "verbo"],
+        id:   "pt-ser-estar",
+        btn:  "SER y ESTAR en portugués",
+        keys: ["ser y estar", "verbo ser", "sou", "estou"],
         text:
 `**Lição: Verbos SER e ESTAR**
 
@@ -487,35 +471,15 @@ El tema más importante para hispanohablantes en portugués.
 *"Onde você **está**?"* — ¿Dónde estás?`
       },
       {
-        keys: ["número", "number", "um", "dois", "três", "contar", "count"],
-        text:
-`**Lição: Os Números em Português 🔢**
-
-\`1 um/uma · 2 dois/duas · 3 três · 4 quatro · 5 cinco\`
-\`6 seis · 7 sete · 8 oito · 9 nove · 10 dez\`
-\`11 onze · 12 doze · 13 treze · 14 quatorze · 15 quinze\`
-\`16 dezesseis · 17 dezessete · 18 dezoito · 19 dezenove · 20 vinte\`
-\`30 trinta · 40 quarenta · 50 cinquenta · 100 cem\`
-
-**Comparación con el español:**
-
-| Español | Português |
-|---|---|
-| tres | **três** |
-| doce | **doze** |
-| veinte | **vinte** |
-| cien | **cem** |
-
-🎯 ¡Los números son casi idénticos! Es uno de los temas más fáciles.`
-      },
-      {
-        keys: ["pronuncia", "pronunciación", "nasal", "lh", "nh", "ã", "õ", "acento"],
+        id:   "pt-pronunciacion",
+        btn:  "Pronunciación del portugués",
+        keys: ["pronunciación", "pronuncia", "nasal"],
         text:
 `**Lição: Pronúncia do Português Brasileiro 🔊**
 
 **1. Vogais Nasais (con til ˜):**
-- **ã** → nasal: *m**ã**e* (madre), *irm**ã*** (hermana)
-- **õ** → nasal: *s**õ**o* (son), *limõ**es*** (limones)
+- **ã** → *m**ã**e* (madre), *irm**ã*** (hermana)
+- **em / en** al final → nasales: *t**em*** (tiene), *b**em*** (bien)
 
 **2. Dígrafo "lh":**
 Suena como la *ll* colombiana:
@@ -528,10 +492,12 @@ Al inicio de palabra, suena como la *j* española:
 **4. "d" y "t" antes de "i":**
 - *d**i**a → "djia"* · ***t**ia → "tchia"*
 
-🎯 **Consejo:** Practica escuchando Música Popular Brasileira (MPB).`
+🎯 Practica escuchando Música Popular Brasileira (MPB).`
       },
       {
-        keys: ["família", "familia", "pai", "mãe", "irmão", "filho"],
+        id:   "pt-familia",
+        btn:  "La familia en portugués",
+        keys: ["família", "familia en portugués"],
         text:
 `**Lição: A Família em Português 👨‍👩‍👧‍👦**
 
@@ -549,11 +515,35 @@ Al inicio de palabra, suena como la *j* española:
 
 🎯 ¡El vocabulario familiar es casi idéntico al español!`
       },
+      // Entrada adicional accesible solo por texto libre
+      {
+        id:   "pt-numbers",
+        keys: ["números en portugués", "contar en portugués"],
+        text:
+`**Lição: Os Números em Português 🔢**
+
+\`1 um/uma · 2 dois/duas · 3 três · 4 quatro · 5 cinco\`
+\`6 seis · 7 sete · 8 oito · 9 nove · 10 dez\`
+\`11 onze · 12 doze · 13 treze · 14 quatorze · 15 quinze\`
+\`16 dezesseis · 17 dezessete · 18 dezoito · 19 dezenove · 20 vinte\`
+\`30 trinta · 40 quarenta · 50 cinquenta · 100 cem\`
+
+| Español | Português |
+|---|---|
+| tres | **três** |
+| veinte | **vinte** |
+| cien | **cem** |
+
+¡Los números son casi idénticos al español!`
+      },
     ],
 
+    // ── WAYUUNAIKI ───────────────────────────────────────────────────────────
     wayuunaiki: [
       {
-        keys: ["saludo", "hola", "buenos días", "anaswachi", "anasü", "greet"],
+        id:   "wy-greet",
+        btn:  "Saludos en Wayuunaiki",
+        keys: ["saludo", "anaswachi", "anasü"],
         text:
 `**Pütchi: Saludos en Wayuunaiki 🪶**
 
@@ -575,7 +565,9 @@ El **Wayuunaiki** es la lengua del pueblo Wayuu, la etnia indígena más numeros
 *(Buenos días! ¿Cómo está? — Estoy bien. ¿Y usted?)*`
       },
       {
-        keys: ["número", "number", "wanee", "piamüin", "contar", "count"],
+        id:   "wy-numbers",
+        btn:  "Números en Wayuunaiki",
+        keys: ["números en wayuunaiki", "wanee", "piamüin"],
         text:
 `**Pütchi: Números en Wayuunaiki 🔢**
 
@@ -595,11 +587,13 @@ El **Wayuunaiki** es la lengua del pueblo Wayuu, la etnia indígena más numeros
 📖 El Wayuunaiki es una lengua **aglutinante** con orden **VSO** (Verbo-Sujeto-Objeto), diferente al español (SVO).`
       },
       {
-        keys: ["juyá", "lluvia", "naturaleza", "agua", "tierra", "mma", "palaa"],
+        id:   "wy-juya",
+        btn:  "¿Qué significa Juyá?",
+        keys: ["juyá", "naturaleza wayuu"],
         text:
 `**Pütchi: La Naturaleza en Wayuunaiki 🌿**
 
-Para los Wayuu, los elementos de la naturaleza son **seres con personalidad propia**, no simples palabras.
+Para los Wayuu, los elementos naturales son **seres con personalidad propia**, no simples palabras.
 
 | Wayuunaiki | Español | Significado cultural |
 |---|---|---|
@@ -614,7 +608,33 @@ Para los Wayuu, los elementos de la naturaleza son **seres con personalidad prop
 🌵 *Juyá* (lluvia) y *Pülowi* (sequía) representan la dualidad fundamental de la cosmovisión Wayuu.`
       },
       {
-        keys: ["frase", "básico", "hablar", "vocabulario", "phrase", "aprender", "common"],
+        id:   "wy-tejido",
+        btn:  "El tejido y arte Wayuu",
+        keys: ["tejido", "mochila", "kanaas"],
+        text:
+`**Pütchi: Arte Textil y Colores Wayuu 🎨**
+
+El tejido Wayuu (*wayuumutsü*) fue declarado **Patrimonio Cultural Inmaterial de la Humanidad** por la UNESCO en 2017.
+
+**Colores en Wayuunaiki:**
+
+| Wayuunaiki | Color | Simbolismo |
+|---|---|---|
+| **Müna** | Rojo | Vida, sangre, fuerza |
+| **Sulu'u** | Negro | Protección, profundidad |
+| **Wasü** | Blanco | Pureza, paz |
+| **Yoluja** | Amarillo | Sol, prosperidad |
+| **Pirruya** | Verde | Naturaleza, esperanza |
+| **Kaatuushikat** | Azul | El mar Caribe, el cielo |
+
+Los patrones (*kanaas*) cuentan historias: rombos = ojos de la araña (sabiduría); zigzag = montañas de la Sierra Nevada.
+
+La mochila (*susu*) se teje completamente a mano y puede tardar entre **8 y 30 días**.`
+      },
+      // Entradas adicionales accesibles solo por texto libre
+      {
+        id:   "wy-frases",
+        keys: ["frases wayuu", "frases básicas", "vocabulario wayuu"],
         text:
 `**Pütchi Básico: Frases Esenciales 🪶**
 
@@ -632,36 +652,15 @@ Para los Wayuu, los elementos de la naturaleza son **seres con personalidad prop
 | **Kaya** | Usted / Tú |
 | **Pütchi** | Palabra / Lengua |
 
-📻 **Consejo:** La Radio Nacional de Colombia transmite programas en Wayuunaiki — es una excelente forma de practicar la entonación.`
+📻 La Radio Nacional de Colombia transmite programas en Wayuunaiki — excelente para practicar la entonación.`
       },
       {
-        keys: ["tejido", "mochila", "color", "arte", "wayuumutsü", "kanaas", "susu"],
-        text:
-`**Pütchi: Arte Textil y Colores Wayuu 🎨**
-
-El tejido Wayuu (*wayuumutsü*) fue declarado **Patrimonio Cultural Inmaterial de la Humanidad** por la UNESCO en 2017.
-
-**Colores en Wayuunaiki:**
-
-| Wayuunaiki | Color | Simbolismo |
-|---|---|---|
-| **Müna** | Rojo | Vida, sangre, fuerza |
-| **Sulu'u** | Negro | Protección, profundidad |
-| **Wasü** | Blanco | Pureza, paz |
-| **Yoluja** | Amarillo | Sol, prosperidad |
-| **Pirruya** | Verde | Naturaleza, esperanza |
-| **Kaatuushikat** | Azul | El mar Caribe, el cielo |
-
-Los patrones (*kanaas*) cuentan historias familiares: rombos = ojos de la araña (sabiduría), zigzag = montañas de la Sierra Nevada.
-
-La mochila (*susu*) se teje completamente a mano y puede tardar entre **8 y 30 días**.`
-      },
-      {
-        keys: ["familia", "clan", "apüshi", "eirruku", "matrilineal", "organización", "social"],
+        id:   "wy-familia",
+        keys: ["organización wayuu", "clan wayuu", "familia wayuu", "eirruku"],
         text:
 `**Pütchi: Familia y Organización Wayuu 👨‍👩‍👧**
 
-La sociedad Wayuu es **matrilineal**: la identidad y herencia se transmiten por línea materna.
+La sociedad Wayuu es **matrilineal**: identidad y herencia se transmiten por línea materna.
 
 | Wayuunaiki | Español |
 |---|---|
@@ -679,7 +678,7 @@ La mujer Wayuu es guardiana del tejido, transmisora del idioma y mediadora en co
     ],
   };
 
-  // Default response when no keyword matches
+  // ---------- Mensajes de bienvenida ----------
   const MOCK_DEFAULT = {
     english:
 `**English Tutor — Ready! 🇬🇧**
@@ -689,12 +688,8 @@ Puedo enseñarte:
 - Tiempos verbales (Past Simple, Future)
 - Vocabulario: colores, números, comida
 - Gramática: preposiciones, artículos
-- Pronunciación para hispanohablantes
 
-💬 **Prueba preguntando:**
-- *"How does Past Simple work?"*
-- *"Teach me colors in English"*
-- *"What are prepositions of place?"*`,
+Usa los botones de abajo para comenzar, o escribe tu propia pregunta.`,
 
     portuguese:
 `**Tutor de Português — Pronto! 🇧🇷**
@@ -702,37 +697,26 @@ Puedo enseñarte:
 Posso te ensinar:
 - Saudações e apresentações
 - Verbos SER e ESTAR
-- Números e vocabulário do dia a dia
-- Pronúncia: vogais nasais, LH, R brasileiro
-- Diferenças e semelhanças com o espanhol
+- Vocabulário e pronúncia brasileira
+- Diferenças com o espanhol
 
-💬 **Tente perguntar:**
-- *"Como usar SER e ESTAR?"*
-- *"Ensina os números em português"*
-- *"Como se pronuncia o LH?"*`,
+Usa los botones de abajo, o escribe tu pregunta.`,
 
     wayuunaiki:
 `**Módulo Wayuunaiki — Anasü! 🪶**
 
 Puedo enseñarte:
-- Saludos y frases básicas (*Anaswachi, Anasü*)
+- Saludos (*Anaswachi, Anasü*)
 - Números en Wayuunaiki
-- Naturaleza y cosmovisión (*Juyá, Mma, Maleiwa*)
-- Arte textil y colores (*wayuumutsü · kanaas*)
-- Familia y organización social (*apüshii · eirruku*)
+- Naturaleza y cosmovisión (*Juyá, Mma*)
+- Arte textil (*wayuumutsü · kanaas*)
 
-💬 **Prueba preguntando:**
-- *"¿Cómo se dice Buenos días?"*
-- *"¿Qué significa Juyá?"*
-- *"Cuéntame sobre el tejido Wayuu"*
-
-🌺 *~300.000 wayuuhablantes mantienen viva esta lengua hoy.*`,
+Usa los botones de abajo, o escribe tu pregunta.`,
   };
 
 
-  // Render a message bubble in the chat area.
-  // role: "user" | "ai" | "system"
-  function renderMessage(role, htmlContent) {
+  // ---------- Renderizado de mensajes ----------
+  function renderMessage(role, content) {
     const chat = document.getElementById("chat");
 
     const wrapper = document.createElement("div");
@@ -743,14 +727,13 @@ Puedo enseñarte:
     if (role === "user") {
       bubble.className = "max-w-xs sm:max-w-sm px-4 py-2.5 rounded-2xl rounded-tr-sm text-sm leading-relaxed text-white";
       bubble.style.background = "linear-gradient(135deg, #14b8a6, #0d9488)";
-      bubble.textContent = htmlContent; // user input is plain text, not Markdown
+      bubble.textContent = content;
     } else if (role === "ai") {
       bubble.className = "ai-bubble max-w-sm sm:max-w-md px-4 py-3 rounded-2xl rounded-tl-sm text-sm leading-relaxed text-slate-700 bg-slate-100";
-      bubble.innerHTML = parseMarkdown(htmlContent);
+      bubble.innerHTML = parseMarkdown(content);
     } else {
-      // System notifications (errors, status changes)
       bubble.className = "w-full text-center text-xs text-slate-400 py-1";
-      bubble.innerHTML = htmlContent;
+      bubble.innerHTML = content;
     }
 
     wrapper.appendChild(bubble);
@@ -758,13 +741,11 @@ Puedo enseñarte:
     chat.scrollTop = chat.scrollHeight;
   }
 
-  // Show or hide the typing indicator while waiting for the AI response.
+  // ---------- Indicador de carga ----------
   function setLoading(active) {
     isLoading = active;
-    const btn   = document.getElementById("sendBtn");
-    const input = document.getElementById("msgInput");
-    btn.disabled   = active;
-    input.disabled = active;
+    document.getElementById("sendBtn").disabled  = active;
+    document.getElementById("msgInput").disabled = active;
 
     const existing = document.getElementById("typingIndicator");
     if (existing) existing.remove();
@@ -774,8 +755,8 @@ Puedo enseñarte:
       const wrapper = document.createElement("div");
       wrapper.id    = "typingIndicator";
       wrapper.className = "msg-enter flex justify-start";
-      wrapper.innerHTML = `
-        <div class="bg-slate-100 px-4 py-3 rounded-2xl rounded-tl-sm flex items-center gap-2">
+      wrapper.innerHTML =
+        `<div class="bg-slate-100 px-4 py-3 rounded-2xl rounded-tl-sm flex items-center gap-2">
           <div class="dot"></div><div class="dot"></div><div class="dot"></div>
           <span class="text-xs text-slate-400 ml-1">La IA está pensando...</span>
         </div>`;
@@ -784,143 +765,81 @@ Puedo enseñarte:
     }
   }
 
-  // Populate the quick-buttons strip for the given module.
+  // ---------- Botones de sugerencia ----------
+  // Genera los botones filtrando las entradas de MOCK que tienen la propiedad `btn`.
   function renderQuickButtons(module) {
     const strip = document.getElementById("quickButtons");
     strip.innerHTML = "";
-    (QUICK_QUERIES[module] || []).forEach(query => {
-      const btn = document.createElement("button");
-      btn.className   = "quick-btn";
-      btn.textContent = query;
-      btn.onclick     = () => sendQuickQuery(query);
-      strip.appendChild(btn);
-    });
+    (MOCK[module] || [])
+      .filter(entry => entry.btn)
+      .forEach(entry => {
+        const btn       = document.createElement("button");
+        btn.className   = "quick-btn";
+        btn.textContent = entry.btn;
+        btn.onclick     = () => sendDirectResponse(entry.id, entry.btn);
+        strip.appendChild(btn);
+      });
   }
 
-  // Fill the input with the chosen query and submit immediately.
-  function sendQuickQuery(query) {
-    const input = document.getElementById("msgInput");
-    input.value = query;
-    enviarMensaje();
+  // Ruta de los botones: búsqueda por ID, nunca por keywords.
+  // Garantiza que cada botón siempre devuelva la lección correcta.
+  async function sendDirectResponse(id, label) {
+    if (isLoading) return;
+    const entry = (MOCK[currentModule] || []).find(e => e.id === id);
+    if (!entry) return;
+
+    renderMessage("user", label);
+    setLoading(true);
+    await new Promise(r => setTimeout(r, 500));
+    setLoading(false);
+    renderMessage("ai", entry.text);
   }
 
-  // Switch the active language module.
-  // Clears the chat to free memory and renders a fresh welcome message.
+  // ---------- Texto libre: búsqueda por keywords ----------
+  // Ruta separada del mecanismo de botones.
+  // Las keywords están diseñadas para evitar colisiones por substrings:
+  // se usan frases en español ("colores", "futuro") en lugar de palabras
+  // cortas en inglés ("in", "on", "one") que aparecen dentro de palabras españolas.
+  function getMockResponse(input, module) {
+    const q     = input.toLowerCase();
+    const match = (MOCK[module] || []).find(e => e.keys.some(k => q.includes(k)));
+    return match ? match.text : MOCK_DEFAULT[module];
+  }
+
+  // ---------- Cambio de módulo ----------
   function switchModule(module) {
     currentModule = module;
-
-    // Clear chat history for this module
     document.getElementById("chat").innerHTML = "";
 
-    // Update tab card styles
     ["english", "portuguese", "wayuunaiki"].forEach(m => {
       const tab = document.getElementById("tab-" + m);
-      // Remove all active classes
-      tab.classList.remove("active-en", "active-pt", "active-wy",
-                           "bg-blue-50", "border-blue-500",
-                           "bg-amber-50", "border-amber-500",
-                           "bg-orange-50", "border-orange-500");
+      tab.classList.remove(
+        "active-en", "active-pt", "active-wy",
+        "bg-blue-50", "border-blue-500",
+        "bg-amber-50", "border-amber-500",
+        "bg-orange-50", "border-orange-500"
+      );
       tab.classList.add("border-slate-200", "bg-white");
     });
 
     const activeTab = document.getElementById("tab-" + module);
     activeTab.classList.remove("border-slate-200", "bg-white");
-
-    const meta = MODULE_META[module];
-    activeTab.classList.add(meta.tabClass);
-
+    activeTab.classList.add(MODULE_META[module].tabClass);
     if (module === "english")    activeTab.classList.add("bg-blue-50",   "border-blue-500");
     if (module === "portuguese") activeTab.classList.add("bg-amber-50",  "border-amber-500");
     if (module === "wayuunaiki") activeTab.classList.add("bg-orange-50", "border-orange-500");
 
-    // Update chat header
+    const meta = MODULE_META[module];
     document.getElementById("chatIcon").textContent  = meta.icon;
     document.getElementById("chatTitle").textContent = meta.title;
     document.getElementById("chatSub").textContent   = meta.sub;
 
-    // Render welcome message for the selected module
     renderMessage("ai", MOCK_DEFAULT[module]);
-
-    // Populate suggestion buttons for this module
     renderQuickButtons(module);
-
     document.getElementById("msgInput").focus();
   }
 
-  // Toggle between demo and edge modes.
-  function toggleMode() {
-    const toggle = document.getElementById("networkToggle");
-    const label  = document.getElementById("modeLabel");
-    const banner = document.getElementById("modeBanner");
-    const badge  = document.getElementById("edgeBadge");
-
-    if (currentMode === "demo") {
-      currentMode = "edge";
-      toggle.classList.add("on");
-      label.textContent  = "🖥️ Servidor Edge Local";
-      label.className    = "text-xs font-semibold text-teal-600 mt-0.5";
-      banner.innerHTML   =
-        `<div class="max-w-2xl mx-auto">
-          <strong>Modo Edge Local activo</strong> — Las peticiones se envían vía HTTP POST a
-          <span class="font-mono">http://localhost:11434/api/generate</span> (Ollama · modelo phi3).
-          Asegúrate de que el servidor esté corriendo.
-        </div>`;
-      banner.style.background   = "#f0fdf4";
-      banner.style.borderColor  = "#bbf7d0";
-      banner.style.color        = "#15803d";
-      badge.classList.remove("hidden");
-      renderMessage("system", "🔄 Modo Edge Local activado — conectando con Ollama...");
-      checkOllamaConnection();
-    } else {
-      currentMode = "demo";
-      toggle.classList.remove("on");
-      label.textContent  = "🌐 Demo Remoto";
-      label.className    = "text-xs font-semibold text-blue-500 mt-0.5";
-      banner.innerHTML   =
-        `<div class="max-w-2xl mx-auto">
-          <strong>Modo Demo activo</strong> — Las respuestas son datos educativos preprogramados (sin petición HTTP real).
-          Activa el switch para conectar con Ollama en <span class="font-mono">localhost:11434</span>.
-        </div>`;
-      banner.style.background   = "#eff6ff";
-      banner.style.borderColor  = "#bfdbfe";
-      banner.style.color        = "#1d4ed8";
-      badge.classList.add("hidden");
-      renderMessage("system", "↩️ Modo Demo activo — respuestas simuladas.");
-    }
-  }
-
-  // Light GET to verify Ollama is reachable before the user sends a message.
-  async function checkOllamaConnection() {
-    const badgeText = document.getElementById("edgeBadgeText");
-    badgeText.textContent = "Verificando...";
-    badgeText.style.color = "#92400e";
-    badgeText.style.background = "#fef3c7";
-    badgeText.style.borderColor = "#fde68a";
-
-    try {
-      const res = await fetch("http://localhost:11434/", { method: "GET" });
-      if (res.ok) {
-        badgeText.textContent   = "Edge conectado ✓";
-        badgeText.style.color   = "#15803d";
-        badgeText.style.background  = "#f0fdf4";
-        badgeText.style.borderColor = "#bbf7d0";
-        renderMessage("system", "✅ Ollama responde en localhost:11434. Modelo phi3 listo.");
-      } else {
-        throw new Error("HTTP " + res.status);
-      }
-    } catch {
-      badgeText.textContent   = "Sin conexión";
-      badgeText.style.color   = "#b91c1c";
-      badgeText.style.background  = "#fef2f2";
-      badgeText.style.borderColor = "#fecaca";
-      renderMessage("system",
-        "⚠️ Ollama no responde en localhost:11434. " +
-        "Ejecuta <strong>ollama serve</strong> y luego <strong>ollama pull phi3</strong>.");
-    }
-  }
-
-  // Central message handler.
-  // Routes to mock data (demo mode) or HTTP POST to Ollama (edge mode).
+  // ---------- Función principal de envío ----------
   async function enviarMensaje() {
     if (isLoading) return;
 
@@ -936,118 +855,133 @@ Puedo enseñarte:
       let response;
 
       if (currentMode === "demo") {
-        // Simulate local processing latency
         await new Promise(r => setTimeout(r, 600));
         response = getMockResponse(text, currentModule);
-
       } else {
-        // HTTP POST to the local Ollama Edge server.
-        // No AbortSignal — hardware decides how long inference takes.
-        // phi3's first-run "cold start" can take over 30 seconds on low-end hardware.
+        // Petición HTTP POST al servidor Ollama local.
+        // Sin AbortSignal: el hardware decide cuánto tarda la inferencia.
+        // El "cold start" de phi3 puede superar 30 segundos en hardware modesto.
         const res = await fetch("http://localhost:11434/api/generate", {
           method:  "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             model:  "phi3",
-            prompt: buildPrompt(text, currentModule),
+            prompt: SYSTEM_PROMPTS[currentModule] + "\n\nEstudiante: " + text + "\n\nRespuesta:",
             stream: false,
           }),
         });
 
         if (!res.ok) throw new Error("HTTP " + res.status + " — " + res.statusText);
 
-        // Ollama returns: { model, created_at, response, done, ... }
+        // Ollama responde con { model, created_at, response, done, ... }
         const data = await res.json();
-        response   = (data.response || "").trim() || "El modelo no generó respuesta. Intenta de nuevo.";
+        response = (data.response || "").trim() || "El modelo no generó respuesta. Intenta de nuevo.";
       }
 
       renderMessage("ai", response);
 
     } catch (err) {
-      renderMessage("ai", buildErrorMessage(err));
+      const isNetwork = err instanceof TypeError || (err.message && err.message.includes("fetch"));
+      const msg = isNetwork
+        ? "**Error de conexión**\n\nNo se pudo conectar con Ollama en `localhost:11434`.\n\n```\nollama serve\nollama pull phi3\n```\n\nPuedes volver al Modo Demo con el switch superior."
+        : "**Error:** " + err.message;
+      renderMessage("ai", msg);
     } finally {
       setLoading(false);
       document.getElementById("msgInput").focus();
     }
   }
 
-  // Lookup a mock response by keyword matching.
-  function getMockResponse(input, module) {
-    const q       = input.toLowerCase();
-    const entries = MOCK[module] || [];
-    const match   = entries.find(e => e.keys.some(k => q.includes(k)));
-    return match ? match.text : MOCK_DEFAULT[module];
-  }
+  // ---------- Toggle de modo de red ----------
+  function toggleMode() {
+    const toggle    = document.getElementById("networkToggle");
+    const label     = document.getElementById("modeLabel");
+    const banner    = document.getElementById("modeBanner");
+    const badge     = document.getElementById("edgeBadge");
 
-  // Build the prompt string sent to phi3.
-  // The system instruction is prepended so the model knows its role.
-  function buildPrompt(userText, module) {
-    const sys = SYSTEM_PROMPTS[module] || "";
-    return sys + "\n\nEstudiante: " + userText + "\n\nRespuesta:";
-  }
+    if (currentMode === "demo") {
+      currentMode = "edge";
+      toggle.classList.add("on");
+      label.textContent = "🖥️ Servidor Edge Local";
+      label.className   = "text-xs font-semibold text-teal-600 mt-0.5";
+      banner.innerHTML  =
+        `<div class="max-w-2xl mx-auto">
+          <strong>Modo Edge Local activo</strong> — Peticiones vía HTTP POST a
+          <span class="font-mono">http://localhost:11434/api/generate</span> (Ollama · modelo phi3).
+          Asegúrate de que el servidor esté corriendo.
+        </div>`;
+      banner.style.cssText = "background:#f0fdf4; border-color:#bbf7d0; color:#15803d;";
+      badge.classList.remove("hidden");
+      renderMessage("system", "🔄 Modo Edge Local activado — verificando Ollama...");
+      checkOllamaConnection();
 
-  // Map fetch/network errors to a user-readable Markdown message.
-  function buildErrorMessage(err) {
-    const isNetwork = err instanceof TypeError || (err.message && err.message.includes("fetch"));
-    if (isNetwork) {
-      return (
-        "**Error de conexión — Servidor Edge no disponible**\n\n" +
-        "No se pudo conectar con Ollama en `localhost:11434`.\n\n" +
-        "**Pasos para activar el servidor Edge:**\n" +
-        "```\n" +
-        "ollama serve\n" +
-        "ollama pull phi3\n" +
-        "```\n\n" +
-        "Puedes volver al Modo Demo usando el switch de la parte superior."
-      );
+    } else {
+      currentMode = "demo";
+      toggle.classList.remove("on");
+      label.textContent = "🌐 Demo Remoto";
+      label.className   = "text-xs font-semibold text-blue-500 mt-0.5";
+      banner.innerHTML  =
+        `<div class="max-w-2xl mx-auto">
+          <strong>Modo Demo activo</strong> — Las respuestas son datos educativos preprogramados (sin petición HTTP real).
+          Activa el switch para conectar con Ollama en <span class="font-mono">localhost:11434</span>.
+        </div>`;
+      banner.style.cssText = "background:#eff6ff; border-color:#bfdbfe; color:#1d4ed8;";
+      badge.classList.add("hidden");
+      renderMessage("system", "↩️ Modo Demo activo — respuestas simuladas.");
     }
-    return "**Error:** " + err.message;
   }
 
+  // GET de verificación a Ollama antes de que el usuario envíe el primer mensaje.
+  async function checkOllamaConnection() {
+    const badgeText = document.getElementById("edgeBadgeText");
+    badgeText.textContent    = "Verificando...";
+    badgeText.style.cssText  = "background:#fef3c7; color:#92400e; border:1px solid #fde68a;";
+    try {
+      const res = await fetch("http://localhost:11434/", { method: "GET" });
+      if (res.ok) {
+        badgeText.textContent   = "Edge conectado ✓";
+        badgeText.style.cssText = "background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0;";
+        renderMessage("system", "✅ Ollama responde en localhost:11434. Modelo phi3 listo.");
+      } else {
+        throw new Error("HTTP " + res.status);
+      }
+    } catch {
+      badgeText.textContent   = "Sin conexión";
+      badgeText.style.cssText = "background:#fef2f2; color:#b91c1c; border:1px solid #fecaca;";
+      renderMessage("system",
+        "⚠️ Ollama no responde en localhost:11434. " +
+        "Ejecuta <strong>ollama serve</strong> y luego <strong>ollama pull phi3</strong>.");
+    }
+  }
 
-  // Minimal Markdown-to-HTML parser.
-  // Handles: code blocks, bold, italic, inline code, tables, bullet lists, line breaks.
+  // ---------- Parser de Markdown ----------
   function parseMarkdown(raw) {
     let h = raw
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
 
-    // Fenced code blocks (``` ... ```)
+    h = parseTables(h);
+
     h = h.replace(/```[\w]*\n?([\s\S]*?)```/g,
       "<pre><code>$1</code></pre>");
 
-    // Tables (must run before line-break conversion)
-    h = parseTables(h);
-
-    // Bold (**text**)
     h = h.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-
-    // Italic (*text*)
     h = h.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, "<em>$1</em>");
-
-    // Inline code (`text`)
     h = h.replace(/`([^`\n]+)`/g, "<code>$1</code>");
 
-    // Bullet lists (- item or • item)
     h = h.replace(/^[-•]\s+(.+)$/gm,
       "<div style='display:flex;gap:6px;margin:2px 0'>" +
         "<span style='color:#0f766e;flex-shrink:0'>▸</span><span>$1</span>" +
       "</div>");
 
-    // Block quotes (> text)
     h = h.replace(/^&gt;\s*(.+)$/gm,
       "<div style='border-left:3px solid #14b8a6;padding:3px 0 3px 10px;color:#64748b;font-style:italic;margin:4px 0'>$1</div>");
 
-    // Checkmarks stay as Unicode (✅ ❌ ✍️)
-
-    // Line breaks
     h = h.replace(/\n/g, "<br>");
-
     return h;
   }
 
-  // Convert Markdown pipe tables to HTML tables.
   function parseTables(text) {
     const lines  = text.split("\n");
     const out    = [];
@@ -1056,48 +990,29 @@ Puedo enseñarte:
 
     for (const line of lines) {
       const trimmed = line.trim();
-
       if (trimmed.startsWith("|") && trimmed.endsWith("|")) {
-        // Separator row (|---|---|) — marks end of header, skip it
-        if (/^\|[\s\-|:]+\|$/.test(trimmed)) {
-          isHeader = false;
-          continue;
-        }
-
-        if (!inTable) {
-          out.push('<div style="overflow-x:auto"><table>');
-          inTable  = true;
-          isHeader = true;
-        }
-
+        if (/^\|[\s\-|:]+\|$/.test(trimmed)) { isHeader = false; continue; }
+        if (!inTable) { out.push('<div style="overflow-x:auto"><table>'); inTable = true; isHeader = true; }
         const cells = trimmed.split("|").slice(1, -1).map(c => c.trim());
         const tag   = isHeader ? "th" : "td";
         out.push("<tr>" + cells.map(c => `<${tag}>${c}</${tag}>`).join("") + "</tr>");
-
       } else {
-        if (inTable) {
-          out.push("</table></div>");
-          inTable  = false;
-          isHeader = true;
-        }
+        if (inTable) { out.push("</table></div>"); inTable = false; isHeader = true; }
         out.push(line);
       }
     }
-
     if (inTable) out.push("</table></div>");
     return out.join("\n");
   }
 
-  // Add the toggle thumb element into the toggle track on load
+  // ---------- Inicialización ----------
   function buildToggle() {
     const track = document.getElementById("networkToggle");
     const thumb = document.createElement("div");
-    thumb.id = "toggleThumb";
     thumb.className = "toggle-thumb";
     track.appendChild(thumb);
   }
 
-  // Bootstrap
   document.addEventListener("DOMContentLoaded", () => {
     buildToggle();
     switchModule("english");
