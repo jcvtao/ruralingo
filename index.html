@@ -62,6 +62,26 @@
     .tab-card.active-en { border-color: #2563eb; background: #eff6ff; }
     .tab-card.active-pt { border-color: #d97706; background: #fffbeb; }
     .tab-card.active-wy { border-color: #ea580c; background: #fff7ed; }
+
+    /* Quick-query suggestion buttons */
+    .quick-btn {
+      flex-shrink: 0;
+      font-size: 0.72rem;
+      font-weight: 500;
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      color: #475569;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+    }
+    .quick-btn:hover        { border-color: #5eead4; background: #f0fdfa; color: #0f766e; }
+    .quick-btn:active       { background: #ccfbf1; }
+    /* Scrollbar for the quick-buttons strip */
+    #quickButtons::-webkit-scrollbar       { height: 3px; }
+    #quickButtons::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 2px; }
   </style>
 </head>
 
@@ -169,6 +189,11 @@
         <!-- Messages area -->
         <div id="chat" class="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3"></div>
 
+        <!-- Quick-query suggestion buttons (scrollable, one row) -->
+        <div class="flex-shrink-0 border-t border-slate-100 px-4 py-2 overflow-x-auto">
+          <div id="quickButtons" class="flex gap-2"></div>
+        </div>
+
         <!-- Input row -->
         <div class="flex-shrink-0 px-4 py-3 border-t border-slate-100 flex gap-2">
           <input
@@ -208,6 +233,36 @@
     english:    { icon: "🇬🇧", title: "Tutor de Inglés",          sub: "English · Nivel A1–B2",                  tabClass: "active-en" },
     portuguese: { icon: "🇧🇷", title: "Tutor de Português",        sub: "Português Brasileiro · A1–B1",            tabClass: "active-pt" },
     wayuunaiki: { icon: "🪶",  title: "Módulo Wayuunaiki",         sub: "Lengua Wayuu · La Guajira, Colombia",     tabClass: "active-wy" },
+  };
+
+  // Predefined queries shown as buttons in demo mode.
+  // Each string is phrased in Spanish but contains at least one keyword that
+  // matches an entry in MOCK, so getMockResponse() always returns a real lesson.
+  const QUICK_QUERIES = {
+    english: [
+      "Enséñame los saludos en inglés",
+      "¿Cómo funciona el Past Simple?",
+      "¿Cuáles son los colores en inglés?",
+      "¿Cuáles son los números en inglés?",
+      "Explícame el futuro: will y going to",
+      "¿Qué son las preposiciones de lugar?",
+      "Vocabulario de comidas en inglés",
+    ],
+    portuguese: [
+      "Enséñame los saludos en portugués",
+      "¿Cómo se usan SER y ESTAR en portugués?",
+      "¿Cuáles son los números en portugués?",
+      "Explícame la pronunciación del portugués",
+      "¿Cómo se dice la familia en portugués?",
+    ],
+    wayuunaiki: [
+      "Enséñame los saludos en Wayuunaiki",
+      "¿Cuáles son los números en Wayuunaiki?",
+      "¿Qué significa Juyá para los Wayuu?",
+      "Enséñame frases básicas en Wayuunaiki",
+      "Cuéntame sobre el tejido y colores Wayuu",
+      "¿Cómo es la organización familiar Wayuu?",
+    ],
   };
 
   // System prompts sent to phi3 when in edge mode.
@@ -729,6 +784,26 @@ Puedo enseñarte:
     }
   }
 
+  // Populate the quick-buttons strip for the given module.
+  function renderQuickButtons(module) {
+    const strip = document.getElementById("quickButtons");
+    strip.innerHTML = "";
+    (QUICK_QUERIES[module] || []).forEach(query => {
+      const btn = document.createElement("button");
+      btn.className   = "quick-btn";
+      btn.textContent = query;
+      btn.onclick     = () => sendQuickQuery(query);
+      strip.appendChild(btn);
+    });
+  }
+
+  // Fill the input with the chosen query and submit immediately.
+  function sendQuickQuery(query) {
+    const input = document.getElementById("msgInput");
+    input.value = query;
+    enviarMensaje();
+  }
+
   // Switch the active language module.
   // Clears the chat to free memory and renders a fresh welcome message.
   function switchModule(module) {
@@ -765,6 +840,9 @@ Puedo enseñarte:
 
     // Render welcome message for the selected module
     renderMessage("ai", MOCK_DEFAULT[module]);
+
+    // Populate suggestion buttons for this module
+    renderQuickButtons(module);
 
     document.getElementById("msgInput").focus();
   }
