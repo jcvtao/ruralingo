@@ -100,7 +100,16 @@ El prototipo opera en dos modos conmutables mediante un switch visible en la int
 
 **1. Instalar Ollama**
 
-Seguir las instrucciones oficiales en [ollama.com/download](https://ollama.com/download) según el sistema operativo.
+- **Linux y macOS:**
+
+  ```bash
+  curl -fsSL https://ollama.com/install.sh | sh
+  ```
+
+- **Windows:** descargar el instalador `.exe` desde [ollama.com/download](https://ollama.com/download/windows) y ejecutarlo. Se instala como servicio en segundo plano; no requiere configuración adicional.
+
+> [!NOTE]
+> En Linux, el instalador también registra Ollama como servicio de systemd, por lo que `ollama serve` puede no ser necesario si el sistema lo inicia automáticamente al arrancar. Verificar con `systemctl status ollama`.
 
 **2. Iniciar el servidor Ollama**
 
@@ -131,6 +140,25 @@ Descargar o clonar este repositorio y abrir `index.html` directamente en el nave
 
 > [!NOTE]
 > Ollama habilita CORS para `localhost` por defecto desde su versión 0.1.24. Si se presentan errores de CORS, verificar que la variable de entorno `OLLAMA_ORIGINS` incluya el origen del navegador, o ejecutar `OLLAMA_ORIGINS="*" ollama serve` en entornos de desarrollo.
+
+### Uso del Modo Servidor Edge Local
+
+Con Ollama corriendo y el modelo descargado, el flujo completo en la interfaz es el siguiente:
+
+1. **Mantener la terminal abierta** con `ollama serve` en ejecución durante toda la sesión. Cerrarla interrumpe el servicio.
+
+2. **Abrir `index.html`** en el navegador (doble clic sobre el archivo, o desde la versión en GitHub Pages si se está en la misma red que el servidor).
+
+3. **Activar el switch "Modo Servidor Edge Local"** en la esquina superior derecha de la interfaz. El banner superior cambiará de azul a verde y aparecerá el indicador *"Verificando..."* junto al encabezado del chat.
+
+4. **Esperar la confirmación de conexión.** La interfaz realiza automáticamente un `GET http://localhost:11434/` para comprobar que el servidor responde. Si la conexión es exitosa, el indicador mostrará *"Edge conectado ✓"*. Si muestra *"Sin conexión"*, revisar que `ollama serve` esté activo en la terminal.
+
+5. **Seleccionar un módulo** (Inglés, Portugués o Wayuunaiki) y escribir una pregunta o usar los botones de sugerencia.
+
+6. **Primera inferencia (*cold start*).** La primera consulta de cada sesión puede tardar entre 15 y 60 segundos mientras phi3 carga en memoria. La interfaz muestra *"La IA está pensando..."* durante ese período; esto es normal y esperado. Las consultas siguientes responden en 3 a 15 segundos según el hardware.
+
+> [!IMPORTANT]
+> La pestaña del navegador y la terminal con `ollama serve` deben permanecer abiertas simultáneamente. Si se cierra la terminal, las peticiones del Modo Edge Local fallarán con un error de conexión visible en el chat.
 
 
 ## Módulos de aprendizaje
