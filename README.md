@@ -2,16 +2,16 @@
 
 Prototipo funcional de una plataforma de asistencia pedagógica para el aprendizaje de inglés y portugués, y la preservación del Wayuunaiki, diseñada para operar en redes locales sin conexión a internet en comunidades rurales de Colombia.
 
+> [!IMPORTANT]
+> El prototipo funcional se puede visualizar y probar en su versión Demo abriendo el siguiente enlace de GitHub Pages: [Ruralingo](https://jcvtao.github.io/ruralingo/)
+
 Este repositorio constituye el componente de implementación de un proyecto de investigación desarrollado en el marco de la asignatura *Redes de Computadores* de la Universidad Nacional de Colombia (Sede Bogotá) durante el periodo académico 2026-1S.
 
 El sustento teórico completo, incluyendo la formulación de la arquitectura de red, el análisis de viabilidad computacional, los protocolos de seguridad propuestos y la revisión de literatura, se encuentra documentado en el artículo de investigación asociado:
 
 > **Vergara Tao, J. C.** (2026). *Ruralingo: Arquitectura de IA Descentralizada para el Fortalecimiento Educativo en Zonas Rurales*. Departamento de Ingeniería de Sistemas y Computación, Universidad Nacional de Colombia.
 >
-> 📄 **[Acceder al artículo completo](https://drive.google.com/file/d/1rJVmuScn2Q4Rohja2eMNEIJoiewzTIAM/view?usp=sharing)**
-
-> [!IMPORTANT]
-> El prototipo funcional se puede visualizar y probar en su versión Demo abriendo el siguiente enlace de GitHub Pages: [Ruralingo](https://jcvtao.github.io/ruralingo/)
+> 📄 **[Acceder al artículo completo](https://github.com/jcvtao/ruralingo/blob/main/ruralingo-articulo.pdf)**
 
 
 ## Descripción del problema
